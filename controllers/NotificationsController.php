@@ -12,7 +12,7 @@ use yii\web\Response;
 class NotificationsController extends Controller
 {
     /**
-     * @var integer The current user id
+     * @var int The current user id
      */
     private $user_id;
 
@@ -44,9 +44,10 @@ class NotificationsController extends Controller
         /** @var Notification $class */
         $class = $this->notificationClass;
         $models = $class::find()->where([
-            'user_id' => $this->user_id,
-            'seen' => $seen
-        ])->all();
+                'user_id' => $this->user_id,
+                'seen' => $seen,
+            ])->andWhere('date_due IS NULL OR date_due <= NOW()')
+            ->all();
 
         $results = [];
 
@@ -59,7 +60,7 @@ class NotificationsController extends Controller
                 'description' => $model->getDescription(),
                 'url' => Url::to(['notifications/rnr', 'id' => $model->id]),
                 'key' => $model->key,
-                'date' => $model->created_at
+                'date' => empty($model->date_due) ? $model->created_at : $model->date_due,
             ];
         }
         return $results;

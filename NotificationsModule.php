@@ -71,4 +71,35 @@ class NotificationsModule extends Module
         }
         return true;
     }
+
+    /**
+     * Creates a notification which becomes active after a specific date
+     * @param Notification $notification The notification class
+     * @param string $date_due the date when notifcation becomes active
+     * @param string $key The notification key
+     * @param integer $user_id The user id that will get the notification
+     * @param integer $key_id The key unique id
+     * @param string $type The notification type
+     * @return bool Returns TRUE on success, FALSE on failure
+     * @throws Exception
+     */
+    public static function timedNotification($notification, $date_due, $key, $user_id, $key_id = null)
+    {
+        if (!in_array($key, $notification::$keys)) {
+            throw new Exception("Not a registered notification key: $key");
+        }
+
+        /** @var Notification $instance */
+        $instance = new $notification([
+            'key' => $key,
+            'type' => Notification::TYPE_DEFAULT,
+            'seen' => 0,
+            'user_id' => $user_id,
+            'key_id' => $key_id,
+            'created_at' => new Expression('NOW()'),
+            'date_due' => $date_due,
+        ]);
+        return $instance->save();
+    }
+
 }

@@ -108,6 +108,22 @@ abstract class Notification extends ActiveRecord
     }
 
     /**
+     * Creates a notification in the future
+     *
+     * @param string $key
+     * @param integer $user_id The user id that will get the notification
+     * @param integer $key_id The foreign instance id
+     * @param string $type
+     * @return bool Returns TRUE on success, FALSE on failure
+     * @throws \Exception
+     */
+    public static function timedNotification($date, $key, $user_id, $key_id = null)
+    {
+        $class = self::className();
+        return NotificationsModule::timedNotification(new $class(), $date, $key, $user_id, $key_id);
+    }
+
+    /**
      * Creates a warning notification
      *
      * @param string $key

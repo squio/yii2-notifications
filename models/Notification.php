@@ -16,6 +16,9 @@ use yii\db\ActiveRecord;
  * @property boolean $seen
  * @property string $created_at
  * @property integer $user_id
+ * @property boolean $send_email
+ * @property string $email_sent Timestamp
+ * @property string $date_due Timestamp
  */
 abstract class Notification extends ActiveRecord
 {
@@ -83,7 +86,7 @@ abstract class Notification extends ActiveRecord
     {
         return [
             [['type', 'user_id', 'key', 'created_at'], 'required'],
-            [['id', 'key_id', 'created_at'], 'safe'],
+            [['id', 'key_id', 'created_at', 'date_due', 'send_email', 'email_sent'], 'safe'],
             [['key_id', 'user_id'], 'integer'],
         ];
     }
@@ -146,4 +149,3 @@ abstract class Notification extends ActiveRecord
     }
 
 }
-

@@ -20,14 +20,15 @@ class NotificationsModule extends Module
     public $notificationClass;
 
     /**
-     * @var callable|integer The current user id
+     * @var callable|int The current user id
      */
     public $userId;
 
     /**
      * @inheritdoc
      */
-    public function init() {
+    public function init()
+    {
         if (is_callable($this->userId)) {
             $this->userId = call_user_func($this->userId);
         }
@@ -39,15 +40,14 @@ class NotificationsModule extends Module
      *
      * @param Notification $notification The notification class
      * @param string $key The notification key
-     * @param integer $user_id The user id that will get the notification
-     * @param integer $key_id The key unique id
+     * @param int $user_id The user id that will get the notification
+     * @param int $key_id The key unique id
      * @param string $type The notification type
      * @return bool Returns TRUE on success, FALSE on failure
      * @throws Exception
      */
     public static function notify($notification, $key, $user_id, $key_id = null, $type = Notification::TYPE_DEFAULT)
     {
-
         if (!in_array($key, $notification::$keys)) {
             throw new Exception("Not a registered notification key: $key");
         }
@@ -73,17 +73,18 @@ class NotificationsModule extends Module
     }
 
     /**
-     * Creates a notification which becomes active after a specific date
+     * Creates a default notification which becomes active after a specific date
+     *
      * @param Notification $notification The notification class
      * @param string $date_due the date when notifcation becomes active
      * @param string $key The notification key
-     * @param integer $user_id The user id that will get the notification
-     * @param integer $key_id The key unique id
-     * @param string $type The notification type
+     * @param int $user_id The user id that will get the notification
+     * @param int $key_id The key unique id
+     * @param bool $send_email
      * @return bool Returns TRUE on success, FALSE on failure
      * @throws Exception
      */
-    public static function timedNotification($notification, $date_due, $key, $user_id, $key_id = null)
+    public static function scheduledNotification($notification, $date_due, $key, $user_id, $key_id = null, $send_email = false)
     {
         if (!in_array($key, $notification::$keys)) {
             throw new Exception("Not a registered notification key: $key");
@@ -98,8 +99,8 @@ class NotificationsModule extends Module
             'key_id' => $key_id,
             'created_at' => new Expression('NOW()'),
             'date_due' => $date_due,
+            'send_email' => $send_email,
         ]);
         return $instance->save();
     }
-
 }

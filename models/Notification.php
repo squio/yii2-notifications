@@ -3,19 +3,19 @@
 namespace machour\yii2\notifications\models;
 
 use machour\yii2\notifications\NotificationsModule;
-use Yii;
+
 use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "notification".
  *
- * @property integer $id
- * @property integer $key_id
+ * @property int $id
+ * @property int $key_id
  * @property string $key
  * @property string $type
  * @property boolean $seen
  * @property string $created_at
- * @property integer $user_id
+ * @property int $user_id
  * @property boolean $send_email
  * @property string $email_sent Timestamp
  * @property string $date_due Timestamp
@@ -24,19 +24,19 @@ abstract class Notification extends ActiveRecord
 {
 
     /**
-     * Default notification
+     * @var string Default notification
      */
     const TYPE_DEFAULT = 'default';
     /**
-     * Error notification
+     * @var string  Error notification
      */
     const TYPE_ERROR   = 'error';
     /**
-     * Warning notification
+     * @var string  Warning notification
      */
     const TYPE_WARNING = 'warning';
     /**
-     * Success notification type
+     * @var string  Success notification type
      */
     const TYPE_SUCCESS = 'success';
 
@@ -95,8 +95,8 @@ abstract class Notification extends ActiveRecord
      * Creates a notification
      *
      * @param string $key
-     * @param integer $user_id The user id that will get the notification
-     * @param integer $key_id The foreign instance id
+     * @param int $user_id The user id that will get the notification
+     * @param int $key_id The foreign instance id
      * @param string $type
      * @return bool Returns TRUE on success, FALSE on failure
      * @throws \Exception
@@ -110,25 +110,43 @@ abstract class Notification extends ActiveRecord
     /**
      * Creates a notification in the future
      *
+     * @param string $date The due date for this notification
      * @param string $key
-     * @param integer $user_id The user id that will get the notification
-     * @param integer $key_id The foreign instance id
-     * @param string $type
+     * @param int $user_id The user id that will get the notification
+     * @param int $key_id The foreign instance id
+     * @param bool $send_email
      * @return bool Returns TRUE on success, FALSE on failure
      * @throws \Exception
      */
-    public static function timedNotification($date, $key, $user_id, $key_id = null)
+    public static function scheduledNotification($date, $key, $user_id, $key_id = null, $send_email = false)
     {
         $class = self::className();
-        return NotificationsModule::timedNotification(new $class(), $date, $key, $user_id, $key_id);
+        return NotificationsModule::scheduledNotification(new $class(), $date, $key, $user_id, $key_id, $send_email);
     }
+
+    /**
+     * Creates a notification in the future which sends an email at the due date
+     *
+     * @param string $date The due date for this notification
+     * @param string $key
+     * @param int $user_id The user id that will get the notification
+     * @param int $key_id The foreign instance id
+     * @return bool Returns TRUE on success, FALSE on failure
+     * @throws \Exception
+     */
+    public static function scheduledEmailNotification($date, $key, $user_id, $key_id = null)
+    {
+        $class = self::className();
+        return NotificationsModule::scheduledNotification(new $class(), $date, $key, $user_id, $key_id, true);
+    }
+
 
     /**
      * Creates a warning notification
      *
      * @param string $key
-     * @param integer $user_id The user id that will get the notification
-     * @param integer $key_id The notification key id
+     * @param int $user_id The user id that will get the notification
+     * @param int $key_id The notification key id
      * @return bool Returns TRUE on success, FALSE on failure
      */
     public static function warning($key, $user_id, $key_id = null)
@@ -141,8 +159,8 @@ abstract class Notification extends ActiveRecord
      * Creates an error notification
      *
      * @param string $key
-     * @param integer $user_id The user id that will get the notification
-     * @param integer $key_id The notification key id
+     * @param int $user_id The user id that will get the notification
+     * @param int $key_id The notification key id
      * @return bool Returns TRUE on success, FALSE on failure
      */
     public static function error($key, $user_id, $key_id = null)
@@ -155,13 +173,12 @@ abstract class Notification extends ActiveRecord
      * Creates a success notification
      *
      * @param string $key
-     * @param integer $user_id The user id that will get the notification
-     * @param integer $key_id The notification key id
+     * @param int $user_id The user id that will get the notification
+     * @param int $key_id The notification key id
      * @return bool Returns TRUE on success, FALSE on failure
      */
     public static function success($key, $user_id, $key_id = null)
     {
         return static::notify($key, $user_id, $key_id, self::TYPE_SUCCESS);
     }
-
 }

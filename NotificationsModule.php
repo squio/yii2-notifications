@@ -91,16 +91,20 @@ class NotificationsModule extends Module
         }
 
         /** @var Notification $instance */
-        $instance = new $notification([
-            'key' => $key,
-            'type' => Notification::TYPE_DEFAULT,
-            'seen' => 0,
-            'user_id' => $user_id,
-            'key_id' => $key_id,
-            'created_at' => new Expression('NOW()'),
-            'date_due' => $date_due,
-            'send_email' => $send_email,
-        ]);
-        return $instance->save();
+        $instance = $notification::findOne(['user_id' => $user_id, 'key' => $key, 'key_id' => $key_id, 'date_due' => $date_due]);
+        if (!$instance) {
+            $instance = new $notification([
+                'key' => $key,
+                'type' => Notification::TYPE_DEFAULT,
+                'seen' => 0,
+                'user_id' => $user_id,
+                'key_id' => $key_id,
+                'created_at' => new Expression('NOW()'),
+                'date_due' => $date_due,
+                'send_email' => $send_email,
+            ]);
+            return $instance->save();
+        }
+        return true;
     }
 }
